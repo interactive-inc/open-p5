@@ -25,6 +25,7 @@ function page(slug: string) {
 }
 
 async function sketchPath(slug: string) {
+  if (slug.includes("..")) return null
   const flat = join(ROOT, `${slug}.ts`)
   if (await Bun.file(flat).exists()) return flat
   const nested = join(ROOT, slug, "sketch.ts")
@@ -95,16 +96,29 @@ const server = Bun.serve({
       }
     }
 
-    const slug = pathname.slice(1)
+    const slug = pathname.slice(1).replace(/\/$/, "")
     if (slug && (await sketchPath(slug))) {
       return new Response(page(slug), { headers: HTML })
     }
 
-    const flat = [...new Bun.Glob("*.ts").scanSync(ROOT)].map((f) => f.replace(/\.ts$/, ""))
+    const flat = [...new Bun.Glob("**/*.ts").scanSync(ROOT)]
+      .filter((f) => !f.endsWith("/sketch.ts"))
+      .map((f) => f.replace(/\.ts$/, ""))
     const nested = [...new Bun.Glob("*/sketch.ts").scanSync(ROOT)].map((f) => f.split("/")[0])
-    const entries = [...new Set([...flat, ...nested])].sort()
+    const all = [...new Set([...flat, ...nested])].sort()
+
+    // /learn のようにディレクトリ名が来たら、その中のスケッチだけを一覧にする
+    // ルートではサブディレクトリ内を並べず「learn/」のような1件にまとめる
+    const inDirectory = slug ? all.filter((s) => s.startsWith(`${slug}/`)) : []
+    if (slug && inDirectory.length === 0) return new Response("Not found", { status: 404 })
+
+    const topLevel = [
+      ...new Set(all.map((s) => (s.includes("/") ? `${s.split("/")[0]}/` : s))),
+    ].sort()
+    const entries = slug ? inDirectory : topLevel
+    const title = slug || "works"
     const list = entries.map((s) => `<li><a href="/${s}">${s}</a></li>`).join("")
-    return new Response(`<!doctype html><meta charset=utf-8><h1>works</h1><ul>${list}</ul>`, {
+    return new Response(`<!doctype html><meta charset=utf-8><h1>${title}</h1><ul>${list}</ul>`, {
       headers: HTML,
     })
   },
