@@ -6,7 +6,7 @@ function setup() {
 }
 
 function draw() {
-  background(8, 8, 12, 18)
+  background(20, 20, 12, 18)
   translate(width / 2, height / 2)
   for (let i = 0; i < 12; i++) {
     const r = 40 + i * 22
