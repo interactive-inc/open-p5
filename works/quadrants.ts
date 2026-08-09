@@ -4,19 +4,19 @@ function setup() {
 
 function draw() {
   if (mouseX > 200 && mouseY < 200) {
-    background('yellow')
+    background("yellow")
   } else if (mouseX < 200 && mouseY < 200) {
-    background('pink')
+    background("pink")
   } else if (mouseX > 200 && mouseY > 200) {
-    background('orange')
+    background("orange")
   } else {
-    background('blue')
+    background("blue")
   }
 
   if (mouseY > 200) {
-    fill('black')
+    fill("black")
   } else {
-    fill('green')
+    fill("green")
   }
 
   circle(200, 200, 30)

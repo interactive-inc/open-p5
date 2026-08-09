@@ -3,11 +3,11 @@ let t = 0
 function setup() {
   createCanvas(600, 600)
   colorMode(HSB, 1, 0.6, 0.5, 0.5)
-} 
+}
 
 function draw() {
   background(1, 1, 0.1)
-  const cols = 60 
+  const cols = 60
   const size = width / cols
   for (let x = 0; x < cols; x++) {
     for (let y = 0; y < cols; y++) {
